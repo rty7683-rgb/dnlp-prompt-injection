@@ -1,0 +1,12 @@
+{
+  "seed": 42,
+  "dataset_name": "deepset/prompt-injections",
+  "validation_ratio": 0.2,
+  "lowercase": true,
+  "min_freq": 2,
+  "alpha": 1.0,
+  "model_b_ngram_range": [1, 1],
+  "model_c_ngram_range": [1, 2],
+  "normalize_urls": false,
+  "normalize_numbers": false
+}
