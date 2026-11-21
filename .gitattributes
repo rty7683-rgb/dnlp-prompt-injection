@@ -1,3 +1,4 @@
 /results/split_manifest.csv text eol=lf
 /results/data_stats.json text eol=lf
 /results/near_duplicate_audit.csv text eol=lf
+/results/near_duplicate_review.csv text eol=lf

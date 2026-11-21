@@ -17,7 +17,7 @@
 
 ## Planned workflow
 1. 데이터셋 구조·라벨 분포·빈 문장·중복을 점검합니다.
-2. 공식 test split은 보존하고 train에서 validation을 만듭니다.
+2. 공식 test 116행을 보존합니다. 수동 누수 점검에서 확인한 test 변형 5행을 공식 train에서 제외하고, 나머지 541행을 변형 그룹 단위로 train과 validation으로 나눕니다.
 3. 텍스트 정규화와 Word Tokenizer를 구현합니다.
 4. **train에서만** vocabulary를 만들고 validation OOV rate를 계산합니다.
 5. Majority baseline을 구현합니다.
@@ -64,7 +64,15 @@ Run `python -m src.data` to regenerate the statistics and split manifest.
 The dataset revision is pinned in `config.json`. The statistics record the
 runtime versions and the manifest SHA-256. Split checks include the configured
 lowercasing and reject overlaps before publishing results. Official test rows
-are preserved.
+are preserved. The original candidate audit is frozen so that the one-based
+pair indices in `results/near_duplicate_review.csv` continue to identify the
+same pairs. Reviewed variants form connected families. A family that touches
+official test is excluded from development data on the official-train side.
+
+With seed 42, five-fold `StratifiedGroupKFold` keeps each remaining family
+together. The validation fold minimizes squared differences from the target
+per-label counts for the 20% holdout. The final train, validation, and test
+sizes are 432, 109, and 116.
 
 Use `src.data.load_verified_splits()` to reuse the saved train and validation
 membership. Pass `include_test=True` for final evaluation after the settings

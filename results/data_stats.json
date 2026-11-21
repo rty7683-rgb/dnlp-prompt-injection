@@ -83,18 +83,72 @@
     }
   },
   "cross_split_normalized_overlap_count": 0,
+  "split_method": "StratifiedGroupKFold; select fold closest to target per-label counts",
+  "stratified_group_folds": 5,
+  "excluded_official_train_source_indices": [
+    176,
+    206,
+    235,
+    284,
+    356
+  ],
+  "official_train_variant_families": [
+    [
+      61,
+      156
+    ],
+    [
+      86,
+      491
+    ],
+    [
+      310,
+      490,
+      530
+    ],
+    [
+      338,
+      493,
+      533
+    ],
+    [
+      348,
+      494
+    ],
+    [
+      358,
+      503
+    ],
+    [
+      402,
+      500,
+      540
+    ],
+    [
+      495,
+      535
+    ],
+    [
+      497,
+      537
+    ]
+  ],
+  "eligible_development_rows": 541,
+  "train_validation_index_overlap_count": 0,
+  "reviewed_cross_split_variant_family_count": 0,
+  "near_duplicate_review_sha256": "e7a797524538bec3b16f96252af4c8a09d82f9dd62c305f03dc09e1c8021dbf8",
   "derived_split_sizes": {
-    "train": 436,
-    "validation": 110,
+    "train": 432,
+    "validation": 109,
     "test": 116
   },
   "derived_split_label_distribution": {
     "train": {
-      "0": 274,
+      "0": 270,
       "1": 162
     },
     "validation": {
-      "0": 69,
+      "0": 68,
       "1": 41
     },
     "test": {
@@ -106,8 +160,8 @@
     "Official test is inspected and preserved without filtering.",
     "Cross-split checks include configured lowercasing.",
     "Vocabulary has not been built yet.",
-    "Near-duplicate/semantic-variant leakage is not automatically removed in Phase 1.",
+    "Reviewed official-train variants of test rows were excluded before model development.",
     "Raw prompt text is not stored in result files."
   ],
-  "manifest_sha256": "f72a4dc72e545408a1c0d88ac5defcf53d12e7b3abfc89767576ed6bae97a45f"
+  "manifest_sha256": "cc85d4753e2c0a3ec8ee73446fa4191682f6c0b6004258e769c3015f8c8c2422"
 }

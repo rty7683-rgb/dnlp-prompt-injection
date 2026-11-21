@@ -3,7 +3,7 @@
 이 문서는 과제에서 요구하는 **직접 구현·수정한 부분, 외부 코드/라이브러리, AI 사용 내역**을 기록합니다.
 
 ## Direct implementation
-Phase 1 데이터셋 점검, 분할 검증 및 분할 간 유사 문장 후보 조사를 완료했습니다.
+Phase 1 데이터셋 점검과 수동 누수 검토를 마치고 최종 분할을 확정했습니다.
 
 예정된 직접 구현 항목:
 - text normalization / word tokenizer
@@ -30,6 +30,12 @@ Phase 1 데이터셋 점검, 분할 검증 및 분할 간 유사 문장 후보 �
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 1 final split
+- Codex recorded the 19 manual decisions as one-based audit pair indices and decisions, with no raw text.
+- Excluded official-train indices 176, 235, 284, 356, and 206 based on the pre-training leakage review. Preserved all 116 official test rows.
+- Kept all nine internal variant families intact using a five-fold stratified group split with seed 42. Selected the fold closest to the target per-label validation counts, yielding 432 train and 109 validation rows.
+- Verified zero reviewed cross-split variant leakage and byte-identical regeneration of split artifacts.
+
 ### Phase 1 near-duplicate audit
 - Codex implemented the audit in `src/near_duplicate_audit.py`. Reproduce it with `python -m src.near_duplicate_audit`.
 - Compare lowercase normalized text across split pairs. Flag character 3–5-gram hashing cosine of at least 0.85, or token-set Jaccard of at least 0.75 with at least five shared tokens.

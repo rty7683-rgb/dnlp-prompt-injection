@@ -28,12 +28,13 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from datasets import load_dataset
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedGroupKFold
 
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS_DIR = ROOT / "results"
 CONFIG_PATH = ROOT / "config.json"
+REVIEWED_AUDIT_SHA256 = "f20719c0d9b7a56e652c8da97c34dc390e107a4e97924b375186b9c2e76e4d87"
 
 
 def load_config() -> dict[str, Any]:
@@ -198,6 +199,56 @@ def load_source_frames(config: dict[str, Any]) -> dict[str, pd.DataFrame]:
     return {name: prepare_frame(dataset[name], name) for name in ("train", "test")}
 
 
+def reviewed_groups(train: pd.DataFrame, test: pd.DataFrame) -> tuple[list[int], list[list[int]]]:
+    """Resolve reviewed pairs to connected families in the official splits."""
+    audit_path = RESULTS_DIR / "near_duplicate_audit.csv"
+    if hashlib.sha256(audit_path.read_bytes()).hexdigest() != REVIEWED_AUDIT_SHA256:
+        raise ValueError("Reviewed audit has changed; pair indices cannot be reused")
+    audit = pd.read_csv(audit_path)
+    review = pd.read_csv(RESULTS_DIR / "near_duplicate_review.csv")
+    if (review["pair_index"].tolist() != list(range(1, len(audit) + 1))
+            or not review["decision"].isin(["SIMILAR", "VARIANT"]).all()):
+        raise ValueError("Expected one valid review decision per audit pair in order")
+
+    source_ids = {"train": set(train["source_index"]), "test": set(test["source_index"])}
+    components = {}
+    for pair in audit.loc[review["decision"].eq("VARIANT")].itertuples(index=False):
+        members = []
+        for split, index in ((pair.left_split, pair.left_source_index),
+                             (pair.right_split, pair.right_source_index)):
+            source = "test" if split == "test" else "train"
+            if index not in source_ids[source]:
+                raise ValueError(f"Reviewed variant references missing {source} index {index}")
+            members.append((source, index))
+        first, second = members
+        family = components.get(first, {first}) | components.get(second, {second})
+        for member in family:
+            components[member] = family
+
+    excluded = sorted(
+        index for (source, index), family in components.items()
+        if source == "train" and any(name == "test" for name, _ in family)
+    )
+    excluded_ids = set(excluded)
+    families = {
+        tuple(sorted(index for _, index in family))
+        for (source, index), family in components.items()
+        if source == "train" and index not in excluded_ids
+    }
+    return excluded, [list(family) for family in sorted(families)]
+
+
+def validate_dev_membership(
+    train_ids: set[int], validation_ids: set[int], eligible_ids: set[int],
+    families: list[list[int]],
+) -> None:
+    if train_ids & validation_ids or (train_ids | validation_ids) != eligible_ids:
+        raise ValueError("Train/validation must partition eligible development data")
+    if any(train_ids.intersection(family) and validation_ids.intersection(family)
+           for family in families):
+        raise ValueError("A reviewed variant family crosses train/validation")
+
+
 def load_verified_splits(*, include_test: bool = False) -> dict[str, pd.DataFrame]:
     """Reuse saved membership and verify it against the pinned source rows."""
     config = load_config()
@@ -206,6 +257,10 @@ def load_verified_splits(*, include_test: bool = False) -> dict[str, pd.DataFram
     sources["train"] = train
     manifest_path = RESULTS_DIR / "split_manifest.csv"
     stats = json.loads((RESULTS_DIR / "data_stats.json").read_text(encoding="utf-8"))
+    review_hash = hashlib.sha256((RESULTS_DIR / "near_duplicate_review.csv").read_bytes()).hexdigest()
+    if review_hash != stats["near_duplicate_review_sha256"]:
+        raise ValueError("Saved splits do not match the current manual review")
+    excluded, families = reviewed_groups(train, sources["test"])
     split_config_keys = (
         "dataset_name", "dataset_revision", "seed", "validation_ratio", "lowercase"
     )
@@ -234,8 +289,7 @@ def load_verified_splits(*, include_test: bool = False) -> dict[str, pd.DataFram
         raise ValueError("Manifest does not preserve official test membership")
     train_ids = set(splits["train"]["source_index"])
     validation_ids = set(splits["validation"]["source_index"])
-    if train_ids & validation_ids or (train_ids | validation_ids) != set(train["source_index"]):
-        raise ValueError("Manifest does not partition the cleaned official train split")
+    validate_dev_membership(train_ids, validation_ids, set(train["source_index"]) - set(excluded), families)
     validate_disjoint_splits(splits, config["lowercase"])
     if not include_test:
         del splits["test"]
@@ -263,11 +317,24 @@ def main() -> None:
     if test_stats["blank_rows"] or test_stats["normalized_duplicate_rows"]:
         raise ValueError("Official test contains blank or duplicate rows; review before proceeding")
 
-    train_df, valid_df = train_test_split(
-        train_clean,
-        test_size=validation_ratio,
-        random_state=seed,
-        stratify=train_clean["label"],
+    excluded, families = reviewed_groups(train_clean, test_raw)
+    eligible = train_clean.loc[~train_clean["source_index"].isin(excluded)]
+    family_ids = {index: family[0] for family in families for index in family}
+    groups = eligible["source_index"].map(lambda index: family_ids.get(index, index))
+    labels = eligible["label"]
+    n_splits = round(1 / validation_ratio)
+    splitter = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=seed)
+    target_counts = labels.value_counts().sort_index() * validation_ratio
+
+    def fold_error(fold: tuple[np.ndarray, np.ndarray]) -> float:
+        counts = labels.iloc[fold[1]].value_counts().reindex(target_counts.index, fill_value=0)
+        return float(((counts - target_counts) ** 2).sum())
+
+    train_rows, valid_rows = min(splitter.split(eligible, labels, groups), key=fold_error)
+    train_df, valid_df = eligible.iloc[train_rows], eligible.iloc[valid_rows]
+    validate_dev_membership(
+        set(train_df["source_index"]), set(valid_df["source_index"]),
+        set(eligible["source_index"]), families,
     )
 
     train_df = train_df.sort_values("source_index").copy()
@@ -320,13 +387,23 @@ def main() -> None:
             },
         },
         "cross_split_normalized_overlap_count": 0,
+        "split_method": "StratifiedGroupKFold; select fold closest to target per-label counts",
+        "stratified_group_folds": n_splits,
+        "excluded_official_train_source_indices": excluded,
+        "official_train_variant_families": families,
+        "eligible_development_rows": len(eligible),
+        "train_validation_index_overlap_count": 0,
+        "reviewed_cross_split_variant_family_count": 0,
+        "near_duplicate_review_sha256": hashlib.sha256(
+            (RESULTS_DIR / "near_duplicate_review.csv").read_bytes()
+        ).hexdigest(),
         "derived_split_sizes": split_counts,
         "derived_split_label_distribution": split_label_distribution,
         "notes": [
             "Official test is inspected and preserved without filtering.",
             "Cross-split checks include configured lowercasing.",
             "Vocabulary has not been built yet.",
-            "Near-duplicate/semantic-variant leakage is not automatically removed in Phase 1.",
+            "Reviewed official-train variants of test rows were excluded before model development.",
             "Raw prompt text is not stored in result files.",
         ],
     }

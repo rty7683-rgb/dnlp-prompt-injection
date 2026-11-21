@@ -10,6 +10,8 @@ from src.data import RESULTS_DIR, load_verified_splits
 
 
 def main() -> None:
+    if (RESULTS_DIR / "near_duplicate_review.csv").exists():
+        raise SystemExit("The original audit is frozen because manual review references its row order.")
     splits = load_verified_splits(include_test=True)
     names = ("train", "validation", "test")
     vectorizer = HashingVectorizer(
