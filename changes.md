@@ -34,6 +34,9 @@ Phase 3 직접 구현 항목:
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 5 error analysis
+- Codex exported all seven official test errors from saved Model B predictions and reviewed three validation errors using the frozen artifact. The CSV records source text, scores, margins, OOV counts, and case-specific hypotheses. No model was fit or changed.
+
 ### Phase 4 official test evaluation
 - Codex implemented and ran the frozen A/B/C evaluation once on all 116 official test rows. Each model was fit on the same 432 train rows used in Phase 3.
 - Recorded test metrics and Model B predictions by source index, and saved the train-only Model B and feature mapping. Reloaded predictions matched exactly. Model B remained the validation-selected model.

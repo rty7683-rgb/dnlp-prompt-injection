@@ -81,6 +81,14 @@ and predicted labels on columns in order `[0, 1]`.
 All 116 predictions matched after reloading the final Model B artifact and
 feature mapping.
 
+### Phase 5 error analysis
+
+We reviewed all seven official test errors (1 FP, 6 FN) and three representative
+validation errors. Recurring patterns included instructions appended to benign
+questions or search phrases, language switches, and indirect instructions.
+OOV rates alone did not explain the errors. Model C also had six official test
+false negatives. Case-level overlap with Model B was not checked.
+
 Run `python -m src.train` to reproduce the fixed validation comparison.
 
 | Model | Accuracy | Macro-F1 |
