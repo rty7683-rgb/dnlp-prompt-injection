@@ -1,5 +1,6 @@
 ﻿"""Evaluate the frozen A/B/C comparison on official test."""
 
+import argparse
 import json
 
 import numpy as np
@@ -16,9 +17,17 @@ from src.vocab import write_json
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--verify-existing", action="store_true",
+        help="Compare with saved official test outputs without writing files",
+    )
+    verify = parser.parse_args().verify_existing
     report_path = RESULTS_DIR / "test_experiments.json"
     predictions_path = RESULTS_DIR / "test_predictions.csv"
-    if report_path.exists() or predictions_path.exists():
+    if verify and not (report_path.is_file() and predictions_path.is_file()):
+        raise SystemExit("Verification requires both saved official test outputs.")
+    if not verify and (report_path.exists() or predictions_path.exists()):
         raise SystemExit("Official test outputs already exist.")
 
     config = load_config()
@@ -83,15 +92,25 @@ def main() -> None:
         }
         if name == "B":
             final = ROOT / "artifacts" / "final"
-            final.mkdir(parents=True, exist_ok=True)
             model_path = final / "model_b.npz"
             features_path = final / "features_b.json"
-            model.save(model_path)
-            write_json(features_path, extractor.vocabulary)
+            if not verify:
+                final.mkdir(parents=True, exist_ok=True)
+                model.save(model_path)
+                write_json(features_path, extractor.vocabulary)
             restored_extractor = NgramCounts(extractor.ngram_range)
             restored_extractor.vocabulary = json.loads(features_path.read_text(encoding="utf-8"))
+            if restored_extractor.vocabulary != extractor.vocabulary:
+                raise RuntimeError("Saved Model B feature mapping differs from reconstruction")
             restored_matrix, _ = restored_extractor.transform(test_docs)
             restored = MultinomialNaiveBayes.load(model_path)
+            if verify and (
+                restored.alpha != model.alpha
+                or not np.array_equal(restored.classes_, model.classes_)
+                or not np.array_equal(restored.class_count_, model.class_count_)
+                or not np.array_equal(restored.feature_count_, model.feature_count_)
+            ):
+                raise RuntimeError("Saved Model B parameters differ from reconstruction")
             if not np.array_equal(restored.predict(restored_matrix), predicted):
                 raise RuntimeError("Reloaded Model B predictions differ")
             predictions = pd.DataFrame({
@@ -103,8 +122,7 @@ def main() -> None:
                 "correct": predicted == y_test,
             })
 
-    predictions.to_csv(predictions_path, index=False, lineterminator="\n")
-    write_json(report_path, {
+    report = {
         "evaluation_split": "test",
         "train_rows": len(train),
         "test_rows": len(test),
@@ -112,7 +130,26 @@ def main() -> None:
         "note": "Model B was frozen using validation only. Test results were not used for model selection.",
         "model_b_reload_predictions_identical": True,
         "experiments": experiments,
-    })
+    }
+    if verify:
+        if report != json.loads(report_path.read_text(encoding="utf-8")):
+            raise RuntimeError("Saved official test metrics differ from reconstruction")
+        saved_predictions = pd.read_csv(predictions_path)
+        score_columns = ["log_score_0", "log_score_1"]
+        pd.testing.assert_frame_equal(
+            saved_predictions.drop(columns=score_columns),
+            predictions.drop(columns=score_columns),
+            check_exact=True,
+        )
+        np.testing.assert_allclose(
+            saved_predictions[score_columns], predictions[score_columns],
+            rtol=0, atol=1e-10, err_msg="Saved official test log scores differ",
+        )
+        print("Existing official test results verified successfully.")
+        return
+
+    predictions.to_csv(predictions_path, index=False, lineterminator="\n")
+    write_json(report_path, report)
 
 
 if __name__ == "__main__":

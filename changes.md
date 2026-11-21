@@ -3,24 +3,13 @@
 이 문서는 과제에서 요구하는 **직접 구현·수정한 부분, 외부 코드/라이브러리, AI 사용 내역**을 기록합니다.
 
 ## Direct implementation
-Phase 1 데이터셋 점검과 수동 누수 검토를 마치고 최종 분할을 확정했습니다.
 
-Phase 2 직접 구현 항목:
-- text normalization / word tokenizer
-- train-only vocabulary builder
-- token-to-ID conversion and UNK handling
-- validation OOV-rate calculation
-
-Phase 3 직접 구현 항목:
-- unigram / bigram feature extraction
-- majority-class baseline
-- Multinomial Naive Bayes
-- Laplace smoothing
-- model save/load
-
-예정된 직접 구현 항목:
-- prediction for new inputs
-- error-analysis export
+- Phase 1 - Dataset inspection, leakage and near-duplicate audit support, and reproducible split validation.
+- Phase 2 - Text normalization, word tokenization, train-only vocabulary, token-to-ID and UNK handling, and validation OOV measurement.
+- Phase 3 - Unigram/bigram BoW extraction, majority baseline, custom Multinomial Naive Bayes, Laplace smoothing, model save/load, and evaluation.
+- Phase 4 - Frozen official test evaluation, prediction export, and read-only verification of saved results.
+- Phase 5 - Frozen model error analysis and export.
+- Phase 6 - Saved final model prediction for new inputs.
 
 ## External libraries
 - `datasets`: 공개 데이터셋 다운로드
@@ -29,13 +18,24 @@ Phase 3 직접 구현 항목:
 - `scikit-learn`: 데이터 split 및 평가 지표
 - `matplotlib`: 결과 시각화
 
+## Team / Roles
+
+This is an individual project.
+
+- Student - Topic selection, final experiment design decisions, experiment execution and review, configuration decisions, result interpretation, report writing, and submission.
+
 ## AI usage
-- ChatGPT: 프로젝트 주제 검토, 실험 설계, 저장소 기본 구조 설계 및 초기 scaffold 생성 지원.
-- 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
+
+- ChatGPT - Compared topic candidates, reviewed the experiment design and submission requirements, cross-checked results at each stage, helped plan error analysis, and helped design the new-input examples.
+- Codex CLI - Assisted with implementation, debugging, test execution, reproducibility checks, and updates to README.md and changes.md.
+- The student finalized model settings and experiment choices based on the assignment requirements and validation results. Model settings were frozen before official test evaluation and remained fixed afterward.
 
 ## Change log
+### Submission cleanup
+- Consolidated setup, reproduction commands, artifact links, individual roles, and AI usage. Added read-only verification of the stored official test results and saved Model B.
+
 ### Phase 6 new-input prediction
-- Codex added a prediction entry point using the saved final Model B and unigram mapping. Ran five user-supplied inputs and recorded normalized log probabilities, margins, unseen unigram counts, and agreement with the reference labels in `results/new_inputs.json`.
+- Codex added a prediction entry point using the saved final Model B and unigram mapping. Ran five demonstration inputs designed with ChatGPT assistance and accepted for the project and recorded normalized log probabilities, margins, unseen unigram counts, and agreement with the reference labels in `results/new_inputs.json`.
 - Four of five predictions matched the reference labels. Verified reproducible output with model fitting and dataset loading disabled.
 
 ### Phase 5 error analysis
@@ -68,7 +68,7 @@ Phase 3 직접 구현 항목:
 - Verified zero reviewed cross-split variant leakage and byte-identical regeneration of split artifacts.
 
 ### Phase 1 near-duplicate audit
-- Codex implemented the audit in `src/near_duplicate_audit.py`. Reproduce it with `python -m src.near_duplicate_audit`.
+- Codex implemented the audit in `src/near_duplicate_audit.py`. The Phase 1 audit CSV is intentionally frozen because the manual review references its row order. The script refuses to overwrite the audit after review.
 - Compare lowercase normalized text across split pairs. Flag character 3–5-gram hashing cosine of at least 0.85, or token-set Jaccard of at least 0.75 with at least five shared tokens.
 - Record 19 candidate pairs in `results/near_duplicate_audit.csv` (12 train–validation, 6 train–test, 1 validation–test). The CSV stores only split names, original row indices, and similarity scores. Existing split membership was preserved.
 
