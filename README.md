@@ -58,7 +58,18 @@
 - 원본 데이터 전체, 가상환경, 캐시는 저장소에 커밋하지 않습니다.
 
 ## Current status
-Phase 1 dataset inspection and split validation are complete.
+Phase 1 split validation and Phase 2 preprocessing, word tokenization, and
+train-only vocabulary construction are complete.
+
+Run `python -m src.vocab` to build the word vocabulary and generate validation
+OOV statistics and token ID examples. It requests only the official train
+split and uses the verified manifest to recover train and validation.
+
+The final vocabulary uses `min_freq=1`. Its 2,058 entries (including
+`<UNK>`) retain all 9,435 train tokens without mapping any to `<UNK>`.
+For this small dataset, we chose to retain rare tokens. Validation OOV is
+526 of 2,955 tokens (17.8003%), compared with 25.4822% at `min_freq=2`
+and 31.0998% at `min_freq=3`.
 
 Run `python -m src.data` to regenerate the statistics and split manifest.
 The dataset revision is pinned in `config.json`. The statistics record the

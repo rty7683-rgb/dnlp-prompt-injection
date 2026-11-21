@@ -1,6 +1,11 @@
-"""Word-level tokenizer used by both Model B and Model C.
+﻿"""Deterministic Unicode word tokenizer for normalized text."""
 
-B/C 비교에서 tokenizer는 동일하게 고정하고 n-gram range만 변경합니다.
-"""
+import re
 
-# TODO: implement after preprocessing rules are finalized.
+# Keep apostrophes and hyphens between word characters. Preserve other
+# punctuation and symbols as individual tokens.
+TOKEN_PATTERN = re.compile(r"\w+(?:['’\-‐‑]\w+)*|[^\w\s]")
+
+
+def tokenize(text: str) -> list[str]:
+    return TOKEN_PATTERN.findall(text)

@@ -1,0 +1,10 @@
+{
+  "train_token_count": 9435,
+  "train_unique_token_count": 2057,
+  "min_freq": 1,
+  "vocabulary_size": 2058,
+  "vocabulary_size_includes_unk": true,
+  "validation_total_token_count": 2955,
+  "validation_oov_token_count": 526,
+  "validation_oov_rate": 0.17800338409475466
+}

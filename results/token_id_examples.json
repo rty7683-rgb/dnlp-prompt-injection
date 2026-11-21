@@ -1,0 +1,48 @@
+[
+  {
+    "split": "train",
+    "source_index": 433,
+    "original_text": "ukraina",
+    "normalized_text": "ukraina",
+    "tokens": [
+      "ukraina"
+    ],
+    "token_ids": [
+      1932
+    ]
+  },
+  {
+    "split": "train",
+    "source_index": 476,
+    "original_text": "Trump bad?",
+    "normalized_text": "trump bad?",
+    "tokens": [
+      "trump",
+      "bad",
+      "?"
+    ],
+    "token_ids": [
+      64,
+      240,
+      2
+    ]
+  },
+  {
+    "split": "validation",
+    "source_index": 102,
+    "original_text": "Is Corona over?",
+    "normalized_text": "is corona over?",
+    "tokens": [
+      "is",
+      "corona",
+      "over",
+      "?"
+    ],
+    "token_ids": [
+      12,
+      174,
+      0,
+      2
+    ]
+  }
+]

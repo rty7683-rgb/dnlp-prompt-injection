@@ -5,11 +5,13 @@
 ## Direct implementation
 Phase 1 데이터셋 점검과 수동 누수 검토를 마치고 최종 분할을 확정했습니다.
 
-예정된 직접 구현 항목:
+Phase 2 직접 구현 항목:
 - text normalization / word tokenizer
 - train-only vocabulary builder
 - token-to-ID conversion and UNK handling
 - validation OOV-rate calculation
+
+예정된 직접 구현 항목:
 - unigram / bigram feature extraction
 - majority-class baseline
 - Multinomial Naive Bayes
@@ -30,6 +32,12 @@ Phase 1 데이터셋 점검과 수동 누수 검토를 마치고 최종 분할�
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 2 preprocessing and vocabulary
+- Codex assisted with implementing NFKC, whitespace normalization, configured lowercasing, and a deterministic Unicode word tokenizer that preserves punctuation and internal apostrophes and hyphens.
+- Built the vocabulary from train frequencies only, with frequency-descending and token-ascending ordering and `<UNK>` at ID 0. Exported validation OOV statistics and three token ID examples.
+- Finalized `min_freq=1` after comparing thresholds 1–3 on the fixed development split. The resulting 2,058-entry vocabulary retains all 9,435 train tokens, avoiding rare-token loss in the small dataset. Validation OOV is 526 of 2,955 tokens (17.8003%), versus 25.4822% and 31.0998% at thresholds 2 and 3.
+- Updated the default verified loader to request only the official train split. Verified byte-identical output on rerun, train-only vocabulary frequencies, validation encoding, and preservation of the Phase 1 manifest and audit files.
+
 ### Phase 1 final split
 - Codex recorded the 19 manual decisions as one-based audit pair indices and decisions, with no raw text.
 - Excluded official-train indices 176, 235, 284, 356, and 206 based on the pre-training leakage review. Preserved all 116 official test rows.

@@ -4,7 +4,7 @@
   "dataset_revision": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
   "validation_ratio": 0.2,
   "lowercase": true,
-  "min_freq": 2,
+  "min_freq": 1,
   "alpha": 1.0,
   "model_b_ngram_range": [1, 1],
   "model_c_ngram_range": [1, 2],

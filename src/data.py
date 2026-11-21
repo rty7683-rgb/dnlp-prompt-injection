@@ -199,7 +199,9 @@ def load_source_frames(config: dict[str, Any]) -> dict[str, pd.DataFrame]:
     return {name: prepare_frame(dataset[name], name) for name in ("train", "test")}
 
 
-def reviewed_groups(train: pd.DataFrame, test: pd.DataFrame) -> tuple[list[int], list[list[int]]]:
+def reviewed_groups(
+    train: pd.DataFrame, test: pd.DataFrame | None = None
+) -> tuple[list[int], list[list[int]]]:
     """Resolve reviewed pairs to connected families in the official splits."""
     audit_path = RESULTS_DIR / "near_duplicate_audit.csv"
     if hashlib.sha256(audit_path.read_bytes()).hexdigest() != REVIEWED_AUDIT_SHA256:
@@ -210,14 +212,16 @@ def reviewed_groups(train: pd.DataFrame, test: pd.DataFrame) -> tuple[list[int],
             or not review["decision"].isin(["SIMILAR", "VARIANT"]).all()):
         raise ValueError("Expected one valid review decision per audit pair in order")
 
-    source_ids = {"train": set(train["source_index"]), "test": set(test["source_index"])}
+    source_ids = {"train": set(train["source_index"])}
+    if test is not None:
+        source_ids["test"] = set(test["source_index"])
     components = {}
     for pair in audit.loc[review["decision"].eq("VARIANT")].itertuples(index=False):
         members = []
         for split, index in ((pair.left_split, pair.left_source_index),
                              (pair.right_split, pair.right_source_index)):
             source = "test" if split == "test" else "train"
-            if index not in source_ids[source]:
+            if source in source_ids and index not in source_ids[source]:
                 raise ValueError(f"Reviewed variant references missing {source} index {index}")
             members.append((source, index))
         first, second = members
@@ -252,7 +256,14 @@ def validate_dev_membership(
 def load_verified_splits(*, include_test: bool = False) -> dict[str, pd.DataFrame]:
     """Reuse saved membership and verify it against the pinned source rows."""
     config = load_config()
-    sources = load_source_frames(config)
+    names = ("train", "validation", "test") if include_test else ("train", "validation")
+    if include_test:
+        sources = load_source_frames(config)
+    else:
+        dataset = load_dataset(
+            config["dataset_name"], revision=config["dataset_revision"], split="train"
+        )
+        sources = {"train": prepare_frame(dataset, "train")}
     train, _ = clean_frame(sources["train"], "train")
     sources["train"] = train
     manifest_path = RESULTS_DIR / "split_manifest.csv"
@@ -260,7 +271,7 @@ def load_verified_splits(*, include_test: bool = False) -> dict[str, pd.DataFram
     review_hash = hashlib.sha256((RESULTS_DIR / "near_duplicate_review.csv").read_bytes()).hexdigest()
     if review_hash != stats["near_duplicate_review_sha256"]:
         raise ValueError("Saved splits do not match the current manual review")
-    excluded, families = reviewed_groups(train, sources["test"])
+    excluded, families = reviewed_groups(train, sources.get("test"))
     split_config_keys = (
         "dataset_name", "dataset_revision", "seed", "validation_ratio", "lowercase"
     )
@@ -272,7 +283,7 @@ def load_verified_splits(*, include_test: bool = False) -> dict[str, pd.DataFram
     if set(manifest["split"]) != {"train", "validation", "test"}:
         raise ValueError("Manifest must contain train, validation, and test")
     splits = {}
-    for name in ("train", "validation", "test"):
+    for name in names:
         rows = manifest.loc[manifest["split"].eq(name)]
         source_name = "test" if name == "test" else "train"
         source = sources[source_name].set_index("source_index", drop=False)
@@ -285,14 +296,12 @@ def load_verified_splits(*, include_test: bool = False) -> dict[str, pd.DataFram
         if labels != rows["label"].tolist() or hashes != rows["text_sha256"].tolist():
             raise ValueError(f"{name}: manifest labels or hashes differ from the source")
         splits[name] = frame
-    if set(splits["test"]["source_index"]) != set(sources["test"]["source_index"]):
+    if include_test and set(splits["test"]["source_index"]) != set(sources["test"]["source_index"]):
         raise ValueError("Manifest does not preserve official test membership")
     train_ids = set(splits["train"]["source_index"])
     validation_ids = set(splits["validation"]["source_index"])
     validate_dev_membership(train_ids, validation_ids, set(train["source_index"]) - set(excluded), families)
     validate_disjoint_splits(splits, config["lowercase"])
-    if not include_test:
-        del splits["test"]
     return splits
 
 
