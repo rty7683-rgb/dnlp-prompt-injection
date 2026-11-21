@@ -1,0 +1,132 @@
+{
+  "evaluation_split": "validation",
+  "train_rows": 432,
+  "validation_rows": 109,
+  "experiments": {
+    "A": {
+      "majority_label": 0,
+      "accuracy": 0.6238532110091743,
+      "macro_f1": 0.384180790960452,
+      "per_class": {
+        "0": {
+          "precision": 0.6238532110091743,
+          "recall": 1.0,
+          "f1": 0.768361581920904
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "confusion_matrix_labels": [
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          68,
+          0
+        ],
+        [
+          41,
+          0
+        ]
+      ]
+    },
+    "B": {
+      "ngram_range": [
+        1,
+        1
+      ],
+      "alpha": 1.0,
+      "feature_vocabulary_size": 2057,
+      "train_matrix_shape": [
+        432,
+        2057
+      ],
+      "validation_matrix_shape": [
+        109,
+        2057
+      ],
+      "train_feature_count": 9435,
+      "train_nonzero_count": 7573,
+      "validation_unseen_ngram_count": 526,
+      "accuracy": 0.9174311926605505,
+      "macro_f1": 0.9124497991967871,
+      "per_class": {
+        "0": {
+          "precision": 0.9402985074626866,
+          "recall": 0.9264705882352942,
+          "f1": 0.9333333333333333
+        },
+        "1": {
+          "precision": 0.8809523809523809,
+          "recall": 0.9024390243902439,
+          "f1": 0.891566265060241
+        }
+      },
+      "confusion_matrix_labels": [
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          63,
+          5
+        ],
+        [
+          4,
+          37
+        ]
+      ]
+    },
+    "C": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "alpha": 1.0,
+      "feature_vocabulary_size": 7116,
+      "train_matrix_shape": [
+        432,
+        7116
+      ],
+      "validation_matrix_shape": [
+        109,
+        7116
+      ],
+      "train_feature_count": 18438,
+      "train_nonzero_count": 16146,
+      "validation_unseen_ngram_count": 2099,
+      "accuracy": 0.8990825688073395,
+      "macro_f1": 0.8929941990182955,
+      "per_class": {
+        "0": {
+          "precision": 0.9253731343283582,
+          "recall": 0.9117647058823529,
+          "f1": 0.9185185185185185
+        },
+        "1": {
+          "precision": 0.8571428571428571,
+          "recall": 0.8780487804878049,
+          "f1": 0.8674698795180723
+        }
+      },
+      "confusion_matrix_labels": [
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          62,
+          6
+        ],
+        [
+          5,
+          36
+        ]
+      ]
+    }
+  }
+}

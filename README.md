@@ -59,7 +59,24 @@
 
 ## Current status
 Phase 1 split validation and Phase 2 preprocessing, word tokenization, and
-train-only vocabulary construction are complete.
+train-only vocabulary construction are complete. Phase 3 validation is
+complete, and Model B is frozen for the final evaluation.
+
+Run `python -m src.train` to reproduce the fixed validation comparison.
+
+| Model | Accuracy | Macro-F1 |
+|---|---:|---:|
+| A · Majority | 0.6239 | 0.3842 |
+| B · Unigram + Multinomial Naive Bayes | 0.9174 | 0.9124 |
+| C · Unigram + Bigram + Multinomial Naive Bayes | 0.8991 | 0.8930 |
+
+B led on both metrics and is frozen with the Phase 2 preprocessing and
+tokenizer, unigram counts, the fixed split, `min_freq=1`, and `alpha=1`.
+Adding bigrams did not improve validation performance. The feature space
+grew from 2,057 to 7,116 with 432 training examples. Greater feature sparsity
+is a possible explanation to investigate during error analysis.
+The custom Naive Bayes matched sklearn's predictions and log probabilities
+on toy data. Phase 3 used only train and validation.
 
 Run `python -m src.vocab` to build the word vocabulary and generate validation
 OOV statistics and token ID examples. It requests only the official train

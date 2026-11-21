@@ -11,12 +11,14 @@ Phase 2 직접 구현 항목:
 - token-to-ID conversion and UNK handling
 - validation OOV-rate calculation
 
-예정된 직접 구현 항목:
+Phase 3 직접 구현 항목:
 - unigram / bigram feature extraction
 - majority-class baseline
 - Multinomial Naive Bayes
 - Laplace smoothing
 - model save/load
+
+예정된 직접 구현 항목:
 - prediction for new inputs
 - error-analysis export
 
@@ -32,6 +34,14 @@ Phase 2 직접 구현 항목:
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 3 validation experiments
+- Codex assisted with implementing train-only word n-gram count features, the majority baseline, and log-space Multinomial Naive Bayes with smoothing and model serialization.
+- Run `python -m src.train` for A/B/C metrics on the fixed validation split. Models B and C share preprocessing, tokenizer, split, classifier, and alpha. C adds bigrams to B's unigram features.
+- Validation n-grams outside the train feature vocabulary are ignored. The Phase 2 UNK ID is used for OOV reporting and is excluded from classifier features.
+- Final validation Accuracy / Macro-F1 were A 0.6239 / 0.3842, B 0.9174 / 0.9124, and C 0.8991 / 0.8930. Froze B because it ranked first on both metrics. B uses unigram counts and alpha 1 with the fixed Phase 1 split and Phase 2 settings.
+- Adding bigrams did not improve validation performance. The feature vocabulary grew from 2,057 to 7,116 with 432 training rows. Greater feature sparsity is a hypothesis for later error analysis.
+- Verified per-class metrics and confusion matrices, shared B/C unigram counts and one-factor conditions, and toy prediction/log-probability parity with sklearn. The official test split was not loaded or evaluated, and the Phase 1 manifest and Phase 2 vocabulary were unchanged.
+
 ### Phase 2 preprocessing and vocabulary
 - Codex assisted with implementing NFKC, whitespace normalization, configured lowercasing, and a deterministic Unicode word tokenizer that preserves punctuation and internal apostrophes and hyphens.
 - Built the vocabulary from train frequencies only, with frequency-descending and token-ascending ordering and `<UNK>` at ID 0. Exported validation OOV statistics and three token ID examples.
