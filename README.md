@@ -60,7 +60,26 @@
 ## Current status
 Phase 1 split validation and Phase 2 preprocessing, word tokenization, and
 train-only vocabulary construction are complete. Phase 3 validation is
-complete, and Model B is frozen for the final evaluation.
+complete. Phase 4 official test evaluation is complete, and the final model
+remains Model B, as selected on validation. Official test results were used
+only for final evaluation.
+
+| Model | Official test Accuracy | Official test Macro-F1 |
+|---|---:|---:|
+| A · Majority | 0.4828 | 0.3256 |
+| B · Unigram + Multinomial Naive Bayes | 0.9397 | 0.9397 |
+| C · Unigram + Bigram + Multinomial Naive Bayes | 0.9310 | 0.9310 |
+
+Model B's confusion matrix is `[[55, 1], [6, 54]]`, with true labels on rows
+and predicted labels on columns in order `[0, 1]`.
+
+| Model B class | Precision | Recall | F1 |
+|---|---:|---:|---:|
+| 0 | 0.9016 | 0.9821 | 0.9402 |
+| 1 | 0.9818 | 0.9000 | 0.9391 |
+
+All 116 predictions matched after reloading the final Model B artifact and
+feature mapping.
 
 Run `python -m src.train` to reproduce the fixed validation comparison.
 

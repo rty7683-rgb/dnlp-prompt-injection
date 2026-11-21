@@ -1,0 +1,115 @@
+{
+  "evaluation_split": "test",
+  "train_rows": 432,
+  "test_rows": 116,
+  "frozen_selected_model": "B",
+  "note": "Model B was frozen using validation only. Test results were not used for model selection.",
+  "model_b_reload_predictions_identical": true,
+  "experiments": {
+    "A": {
+      "majority_label": 0,
+      "accuracy": 0.4827586206896552,
+      "macro_f1": 0.32558139534883723,
+      "per_class": {
+        "0": {
+          "precision": 0.4827586206896552,
+          "recall": 1.0,
+          "f1": 0.6511627906976745
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "confusion_matrix_labels": [
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          56,
+          0
+        ],
+        [
+          60,
+          0
+        ]
+      ]
+    },
+    "B": {
+      "ngram_range": [
+        1,
+        1
+      ],
+      "alpha": 1.0,
+      "feature_vocabulary_size": 2057,
+      "test_unseen_ngram_count": 600,
+      "accuracy": 0.9396551724137931,
+      "macro_f1": 0.9396506874767745,
+      "per_class": {
+        "0": {
+          "precision": 0.9016393442622951,
+          "recall": 0.9821428571428571,
+          "f1": 0.9401709401709402
+        },
+        "1": {
+          "precision": 0.9818181818181818,
+          "recall": 0.9,
+          "f1": 0.9391304347826087
+        }
+      },
+      "confusion_matrix_labels": [
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          55,
+          1
+        ],
+        [
+          6,
+          54
+        ]
+      ]
+    },
+    "C": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "alpha": 1.0,
+      "feature_vocabulary_size": 7116,
+      "test_unseen_ngram_count": 2264,
+      "accuracy": 0.9310344827586207,
+      "macro_f1": 0.9310344827586207,
+      "per_class": {
+        "0": {
+          "precision": 0.9,
+          "recall": 0.9642857142857143,
+          "f1": 0.9310344827586207
+        },
+        "1": {
+          "precision": 0.9642857142857143,
+          "recall": 0.9,
+          "f1": 0.9310344827586207
+        }
+      },
+      "confusion_matrix_labels": [
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          54,
+          2
+        ],
+        [
+          6,
+          54
+        ]
+      ]
+    }
+  }
+}

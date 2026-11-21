@@ -34,6 +34,12 @@ Phase 3 직접 구현 항목:
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 4 official test evaluation
+- Codex implemented and ran the frozen A/B/C evaluation once on all 116 official test rows. Each model was fit on the same 432 train rows used in Phase 3.
+- Recorded test metrics and Model B predictions by source index, and saved the train-only Model B and feature mapping. Reloaded predictions matched exactly. Model B remained the validation-selected model.
+- Official test Accuracy / Macro-F1 were A 0.4828 / 0.3256, B 0.9397 / 0.9397, and C 0.9310 / 0.9310. Test results were used only for final evaluation.
+- Model B's confusion matrix was `[[55, 1], [6, 54]]` in label order `[0, 1]` (actual rows, predicted columns). Precision / Recall / F1 were 0.9016 / 0.9821 / 0.9402 for class 0 and 0.9818 / 0.9000 / 0.9391 for class 1.
+
 ### Phase 3 validation experiments
 - Codex assisted with implementing train-only word n-gram count features, the majority baseline, and log-space Multinomial Naive Bayes with smoothing and model serialization.
 - Run `python -m src.train` for A/B/C metrics on the fixed validation split. Models B and C share preprocessing, tokenizer, split, classifier, and alpha. C adds bigrams to B's unigram features.
