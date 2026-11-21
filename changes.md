@@ -30,6 +30,12 @@
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 1 review follow-up
+- Codex updated the Phase 1 data pipeline, configuration, dependency pins, and README.
+- Preserve every official test row and reject blank or duplicate test rows, invalid binary labels, and overlaps across splits before publishing results.
+- Pin the dataset revision, record runtime versions, stage both results before publishing, and verify the manifest checksum and source membership when loading saved splits.
+- Re-ran Phase 1 on the pinned revision and verified that the train, validation, and official test membership stayed the same.
+
 ### Phase 1 dataset inspection
 - Codex assisted with fixing `src/data.py` to read the normalized text by position when generating manifest hashes.
 - Ran `python -m src.data` and verified the 662 manifest rows against the split counts and label distributions in `results/data_stats.json`. The split sizes are 436 train, 110 validation, and 116 test.

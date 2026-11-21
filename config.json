@@ -1,6 +1,7 @@
 {
   "seed": 42,
   "dataset_name": "deepset/prompt-injections",
+  "dataset_revision": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
   "validation_ratio": 0.2,
   "lowercase": true,
   "min_freq": 2,

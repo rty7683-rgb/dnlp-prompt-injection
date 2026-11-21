@@ -58,16 +58,26 @@
 - 원본 데이터 전체, 가상환경, 캐시는 저장소에 커밋하지 않습니다.
 
 ## Current status
-Project scaffold initialized.  
-Next step: **Phase 1 — dataset inspection and data split validation**.
+Phase 1 dataset inspection and split validation are complete.
+
+Run `python -m src.data` to regenerate the statistics and split manifest.
+The dataset revision is pinned in `config.json`. The statistics record the
+runtime versions and the manifest SHA-256. Split checks include the configured
+lowercasing and reject overlaps before publishing results. Official test rows
+are preserved.
+
+Use `src.data.load_verified_splits()` to reuse the saved train and validation
+membership. Pass `include_test=True` for final evaluation after the settings
+have been fixed. The loader verifies the saved membership, labels, and hashes.
 
 ## Dataset
 - Hugging Face dataset: `deepset/prompt-injections`
 
-원본 데이터는 저장소에 포함하지 않고 코드에서 다운로드하도록 구성할 예정입니다.
+원본 데이터는 저장소에 포함하지 않으며 코드에서 지정된 revision을 다운로드합니다.
 
 ## Environment
-개발 환경이 확정되면 Python 버전과 정확한 패키지 버전을 기록합니다.
+Phase 1 검증 환경은 Python 3.14.0이며 직접 사용하는 패키지의 버전은
+`requirements.txt`에 고정되어 있습니다.
 
 ```bash
 pip install -r requirements.txt

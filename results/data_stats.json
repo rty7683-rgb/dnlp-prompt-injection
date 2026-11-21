@@ -1,7 +1,17 @@
 {
   "dataset_name": "deepset/prompt-injections",
+  "dataset_revision": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
+  "python_version": "3.14.0",
+  "package_versions": {
+    "datasets": "5.2.0",
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "scikit-learn": "1.9.1",
+    "matplotlib": "3.11.2"
+  },
   "seed": 42,
   "validation_ratio": 0.2,
+  "lowercase": true,
   "official_raw_split_sizes": {
     "train": 546,
     "test": 116
@@ -93,9 +103,11 @@
     }
   },
   "notes": [
-    "Official test membership is preserved; only blank/same-text duplicate cleaning is applied.",
+    "Official test is inspected and preserved without filtering.",
+    "Cross-split checks include configured lowercasing.",
     "Vocabulary has not been built yet.",
     "Near-duplicate/semantic-variant leakage is not automatically removed in Phase 1.",
     "Raw prompt text is not stored in result files."
-  ]
+  ],
+  "manifest_sha256": "f72a4dc72e545408a1c0d88ac5defcf53d12e7b3abfc89767576ed6bae97a45f"
 }
