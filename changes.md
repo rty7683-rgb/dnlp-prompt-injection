@@ -30,6 +30,11 @@
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 1 dataset inspection
+- Codex assisted with fixing `src/data.py` to read the normalized text by position when generating manifest hashes.
+- Ran `python -m src.data` and verified the 662 manifest rows against the split counts and label distributions in `results/data_stats.json`. The split sizes are 436 train, 110 validation, and 116 test.
+- Found no blank rows, conflicting labels, or exact duplicates after duplicate-check normalization. The official test retained all 116 rows.
+
 ### Initial scaffold
 - 프로젝트 주제를 prompt injection detection으로 확정
 - A/B/C 비교 실험 구조 설계

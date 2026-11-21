@@ -159,13 +159,16 @@ def make_manifest(
         ("validation", valid_df),
         ("test", test_df),
     ]:
-        for row in frame.itertuples(index=False):
+        columns = ["source_index", "label", "_norm_text"]
+        for source_index, label, norm_text in frame[columns].itertuples(
+            index=False, name=None
+        ):
             rows.append(
                 {
                     "split": split_name,
-                    "source_index": int(row.source_index),
-                    "label": int(row.label),
-                    "text_sha256": sha256_text(row._norm_text),
+                    "source_index": int(source_index),
+                    "label": int(label),
+                    "text_sha256": sha256_text(norm_text),
                 }
             )
     return pd.DataFrame(rows)

@@ -1,0 +1,101 @@
+{
+  "dataset_name": "deepset/prompt-injections",
+  "seed": 42,
+  "validation_ratio": 0.2,
+  "official_raw_split_sizes": {
+    "train": 546,
+    "test": 116
+  },
+  "raw_inspection": {
+    "train": {
+      "rows": 546,
+      "blank_rows": 0,
+      "nonblank_rows": 546,
+      "label_distribution_nonblank": {
+        "0": 343,
+        "1": 203
+      },
+      "raw_duplicate_rows": 0,
+      "normalized_duplicate_rows": 0,
+      "conflicting_normalized_text_groups": 0,
+      "character_length": {
+        "min": 7,
+        "mean": 117.48,
+        "median": 63.0,
+        "p95": 317.25,
+        "max": 4545
+      },
+      "whitespace_token_length": {
+        "min": 1,
+        "mean": 19.44,
+        "median": 10.0,
+        "p95": 52.0,
+        "max": 783
+      }
+    },
+    "test": {
+      "rows": 116,
+      "blank_rows": 0,
+      "nonblank_rows": 116,
+      "label_distribution_nonblank": {
+        "0": 56,
+        "1": 60
+      },
+      "raw_duplicate_rows": 0,
+      "normalized_duplicate_rows": 0,
+      "conflicting_normalized_text_groups": 0,
+      "character_length": {
+        "min": 16,
+        "mean": 125.05,
+        "median": 73.5,
+        "p95": 357.5,
+        "max": 632
+      },
+      "whitespace_token_length": {
+        "min": 3,
+        "mean": 20.12,
+        "median": 12.0,
+        "p95": 59.0,
+        "max": 98
+      }
+    }
+  },
+  "cleaning": {
+    "train": {
+      "removed_blank": 0,
+      "removed_same_text_duplicates": 0,
+      "remaining_rows": 546
+    },
+    "test": {
+      "removed_blank": 0,
+      "removed_same_text_duplicates": 0,
+      "remaining_rows": 116
+    }
+  },
+  "cross_split_normalized_overlap_count": 0,
+  "derived_split_sizes": {
+    "train": 436,
+    "validation": 110,
+    "test": 116
+  },
+  "derived_split_label_distribution": {
+    "train": {
+      "0": 274,
+      "1": 162
+    },
+    "validation": {
+      "0": 69,
+      "1": 41
+    },
+    "test": {
+      "0": 56,
+      "1": 60
+    }
+  },
+  "notes": [
+    "Official test membership is preserved; only blank/same-text duplicate cleaning is applied.",
+    "Vocabulary has not been built yet.",
+    "Near-duplicate/semantic-variant leakage is not automatically removed in Phase 1.",
+    "Raw prompt text is not stored in result files."
+  ]
+}
