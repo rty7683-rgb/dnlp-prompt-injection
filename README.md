@@ -89,6 +89,21 @@ questions or search phrases, language switches, and indirect instructions.
 OOV rates alone did not explain the errors. Model C also had six official test
 false negatives. Case-level overlap with Model B was not checked.
 
+### Phase 6 new-input prediction
+
+Run `python -m src.predict` to reproduce the five examples using the saved
+Model B. Four predictions matched the reference labels, covering a clear
+benign question, a direct injection, an indirect injection, and a
+spelling-variant injection. The model labeled a benign question about the
+meaning of “ignore previous instructions” as an injection. This illustrates
+a limitation of unigram Bag-of-Words: it captures which words appear, but
+cannot reliably tell whether an expression is a command or is being quoted
+for explanation.
+
+The demo loads the frozen Model B and its saved feature mapping. The
+reference labels are used only to compare predictions. No fitting or
+dataset loading occurred, and the model and settings were preserved.
+
 Run `python -m src.train` to reproduce the fixed validation comparison.
 
 | Model | Accuracy | Macro-F1 |

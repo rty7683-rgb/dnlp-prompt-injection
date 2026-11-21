@@ -34,6 +34,10 @@ Phase 3 직접 구현 항목:
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 6 new-input prediction
+- Codex added a prediction entry point using the saved final Model B and unigram mapping. Ran five user-supplied inputs and recorded normalized log probabilities, margins, unseen unigram counts, and agreement with the reference labels in `results/new_inputs.json`.
+- Four of five predictions matched the reference labels. Verified reproducible output with model fitting and dataset loading disabled.
+
 ### Phase 5 error analysis
 - Codex exported all seven official test errors from saved Model B predictions and reviewed three validation errors using the frozen artifact. The CSV records source text, scores, margins, OOV counts, and case-specific hypotheses. No model was fit or changed.
 
