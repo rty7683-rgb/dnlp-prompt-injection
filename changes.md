@@ -18,6 +18,12 @@
 - `scikit-learn`: 데이터 split 및 평가 지표
 - `matplotlib`: 결과 시각화
 
+## External code references
+
+- 별도의 외부 프로젝트 코드를 복사하여 사용하지 않았다.
+- `scikit-learn`은 데이터 분할, 평가 지표, 그리고 직접 구현한 Naive Bayes의 toy sanity check에만 사용하였다.
+- 실제 프로젝트 분류 모델은 `src/models/naive_bayes.py`에서 직접 구현하였다.
+
 ## Team / Roles
 
 This is an individual project.
