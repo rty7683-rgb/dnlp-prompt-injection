@@ -3,7 +3,7 @@
 이 문서는 과제에서 요구하는 **직접 구현·수정한 부분, 외부 코드/라이브러리, AI 사용 내역**을 기록합니다.
 
 ## Direct implementation
-현재는 프로젝트 기본 구조만 생성한 상태입니다.
+Phase 1 데이터셋 점검, 분할 검증 및 분할 간 유사 문장 후보 조사를 완료했습니다.
 
 예정된 직접 구현 항목:
 - text normalization / word tokenizer
@@ -30,6 +30,11 @@
 - 이후 코드 작성/디버깅에 AI 도움을 사용한 경우 해당 파일과 내용을 계속 기록합니다.
 
 ## Change log
+### Phase 1 near-duplicate audit
+- Codex implemented the audit in `src/near_duplicate_audit.py`. Reproduce it with `python -m src.near_duplicate_audit`.
+- Compare lowercase normalized text across split pairs. Flag character 3–5-gram hashing cosine of at least 0.85, or token-set Jaccard of at least 0.75 with at least five shared tokens.
+- Record 19 candidate pairs in `results/near_duplicate_audit.csv` (12 train–validation, 6 train–test, 1 validation–test). The CSV stores only split names, original row indices, and similarity scores. Existing split membership was preserved.
+
 ### Phase 1 review follow-up
 - Codex updated the Phase 1 data pipeline, configuration, dependency pins, and README.
 - Preserve every official test row and reject blank or duplicate test rows, invalid binary labels, and overlaps across splits before publishing results.
