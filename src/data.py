@@ -78,7 +78,7 @@ def prepare_frame(dataset_split, split_name: str) -> pd.DataFrame:
         )
 
     df = df[["text", "label"]].copy()
-    df["_source_index"] = np.arange(len(df))
+    df["source_index"] = np.arange(len(df))
     df["text"] = df["text"].fillna("").astype(str)
     df["label"] = df["label"].astype(int)
     df["_norm_text"] = df["text"].map(normalize_for_duplicate_check)
@@ -163,7 +163,7 @@ def make_manifest(
             rows.append(
                 {
                     "split": split_name,
-                    "source_index": int(row._source_index),
+                    "source_index": int(row.source_index),
                     "label": int(row.label),
                     "text_sha256": sha256_text(row._norm_text),
                 }
@@ -207,9 +207,9 @@ def main() -> None:
         stratify=train_clean["label"],
     )
 
-    train_df = train_df.sort_values("_source_index").copy()
-    valid_df = valid_df.sort_values("_source_index").copy()
-    test_df = test_clean.sort_values("_source_index").copy()
+    train_df = train_df.sort_values("source_index").copy()
+    valid_df = valid_df.sort_values("source_index").copy()
+    test_df = test_clean.sort_values("source_index").copy()
 
     split_counts = {
         "train": int(len(train_df)),
